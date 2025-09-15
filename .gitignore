@@ -1,0 +1,78 @@
+# R / Shiny specific
+.RData
+.Rhistory
+.Rproj.user/
+*.Rproj
+*.Rmd
+*.Rmd.html
+.Rcheck/
+.Rout
+.Rout.fail
+.Renviron
+.Rprofile
+.Rprofile.user
+.RStudio/
+.RStudio/
+
+# Data files (ignorar solo archivos de entrada que pueden cambiar y no deben ir al repo)
+data/*.csv
+data/*.xlsx
+data/*.xls
+data/*.sav
+data/*.dta
+data/*_backup.*
+data/historico/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.swn
+*.log
+*.tmp
+~*
+.idea/
+.vscode/
+*.lock
+.env
+.env.example
+
+# R packages
+lib/
+library/
+packages/
+
+# Shiny App logs and cache
+www/cache/
+www/temp/
+.Rapp.history
+
+# Jupyter / Python (por si acaso)
+__pycache__/
+*.pyc
+.ipynb_checkpoints
+
+# Build and output files
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.html
+*.htm
+*.docx
+*.pptx
+
+# Shapefiles: ¡NO IGNORARLOS! Son esenciales
+# Pero sí ignorar archivos temporales que no son necesarios
+afiliacion_shp/*/*.sbn
+afiliacion_shp/*/*.sbx
+afiliacion_shp/*/*.fbn
+afiliacion_shp/*/*.fbx
+afiliacion_shp/*/*.ain
+afiliacion_shp/*/*.aih
+afiliacion_shp/*/*.atx
+afiliacion_shp/*/*.ixs
+afiliacion_shp/*/*.mxs
+afiliacion_shp/*/*.qix
