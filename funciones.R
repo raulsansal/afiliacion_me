@@ -1,4 +1,5 @@
 # funciones.R
+
 library(readr)
 library(dplyr)
 library(stringr)
@@ -33,7 +34,7 @@ cargar_afiliaciones_todos <- function() {
     
     cat("  → Cargando:", estado_nombre_clean, "\n")
     
-    # 🔥 LECTURA ROBUSTA: Intenta leer con col_types, si falla, repara automáticamente
+    # 🔥 Intentar leer con col_types (forma ideal)
     df <- tryCatch({
       read_csv(
         .x,
@@ -59,31 +60,49 @@ cargar_afiliaciones_todos <- function() {
         show_col_types = FALSE
       )
     }, error = function(e) {
-      # Si falla, intentamos leerlo como texto y forzar las columnas
+      # Si falla, intentar leer como texto y reconstruir
       cat("⚠️  Error al leer con col_types. Intentando reparar archivo manualmente...\n")
       
       lines <- readLines(.x, warn = FALSE)
-      header <- str_split_fixed(lines[1], ",", n = 16)
-      data_lines <- lapply(lines[-1], function(x) str_split_fixed(x, ",", n = 16))
+      
+      if (length(lines) == 0) return(NULL)
+      
+      header_line <- lines[1]
+      if (!grepl(",", header_line)) {
+        cat("❌ El archivo", basename(.x), "no tiene formato CSV válido.\n")
+        return(NULL)
+      }
+      
+      header_cols <- str_split_fixed(header_line, ",", n = 16)
+      if (length(header_cols) != 16) {
+        cat("❌ Encabezado del archivo", basename(.x), "tiene", length(header_cols), "columnas, se esperaban 16.\n")
+        return(NULL)
+      }
+      
+      data_lines <- lapply(lines[-1], function(x) {
+        if (x == "") return(rep(NA, 16))
+        str_split_fixed(x, ",", n = 16)
+      })
+      
       data_matrix <- do.call(rbind, data_lines)
       df <- as.data.frame(data_matrix, stringsAsFactors = FALSE)
-      names(df) <- as.character(header)
+      names(df) <- as.character(header_cols)
       return(df)
     })
     
-    # Asegurar que tiene las 16 columnas correctas
+    # Validar número de columnas
     expected_cols <- c(
       "id", "nombre", "sexo", "edad", "clave_elector", "email", "telefono",
       "cve_estado", "estado", "cve_distrito", "distrito", "cve_municipio",
       "municipio", "seccion", "estatus", "notas"
     )
     
-    if (ncol(df) != length(expected_cols)) {
-      cat("❌ El archivo", basename(.x), "tiene", ncol(df), "columnas, se esperaban", length(expected_cols), "\n")
+    if (is.null(df) || ncol(df) != length(expected_cols)) {
+      cat("❌ El archivo", basename(.x), "no tiene 16 columnas válidas. Saltando.\n")
       return(NULL)
     }
     
-    # Renombrar columnas si están desordenadas o mal nombradas
+    # Renombrar columnas si están mal
     names(df) <- expected_cols
     
     # Limpieza y normalización
@@ -92,8 +111,8 @@ cargar_afiliaciones_todos <- function() {
         across(all_of(c("id", "nombre", "sexo", "clave_elector", "email", "telefono", "estado", "distrito", "municipio", "notas")), ~ trimws(as.character(.))),
         cve_estado = trimws(cve_estado),
         cve_distrito = trimws(cve_distrito),
-        distrito_num = str_sub(cve_distrito, -2, -1),  # ✅ Últimos 2 caracteres (funciona con "922", "1501", etc.)
-        estado = estado_nombre_clean,
+        distrito_num = str_sub(cve_distrito, -2, -1),  # ✅ Últimos 2 caracteres
+        estado = estado_nombre_clean,  # ← Aquí asignamos el nombre limpio
         estatus = trimws(estatus),
         edad = as.integer(edad)
       ) %>%
@@ -115,22 +134,33 @@ cargar_afiliaciones_todos <- function() {
   return(df_total)
 }
 
-# ✅ Función de agregación (sin cambios, ya funcionaba perfectamente)
+# ✅ FUNCION CORREGIDA: generar_resumen() — AHORA INCLUYE estado_nombre
 generar_resumen <- function(df) {
   resumen <- df %>%
-    group_by(cve_estado, distrito_num, estatus) %>%
+    group_by(cve_estado, distrito_num, estado, estatus) %>%  # ✅ AÑADIMOS "estado" aquí
     summarise(total = n(), .groups = 'drop') %>%
-    mutate(nivel = "distrital")
+    mutate(
+      nivel = "distrital",
+      estado_nombre = estado  # ✅ AÑADIMOS ESTA COLUMNA EXPLÍCITA
+    ) %>%
+    select(-estado)  # Opcional: eliminar "estado" si no quieres duplicación
   
   resumen_estatal <- df %>%
-    group_by(cve_estado, estatus) %>%
+    group_by(cve_estado, estado, estatus) %>%  # ✅ AÑADIMOS "estado" aquí
     summarise(total = n(), .groups = 'drop') %>%
-    mutate(nivel = "estatal")
+    mutate(
+      nivel = "estatal",
+      estado_nombre = estado  # ✅ AÑADIMOS ESTA COLUMNA EXPLÍCITA
+    ) %>%
+    select(-estado)
   
   resumen_nacional <- df %>%
     group_by(estatus) %>%
     summarise(total = n(), .groups = 'drop') %>%
-    mutate(nivel = "nacional")
+    mutate(
+      nivel = "nacional",
+      estado_nombre = "Nacional"  # ✅ Para que tenga sentido en filtro
+    )
   
   resumen_completo <- bind_rows(resumen_nacional, resumen_estatal, resumen)
   return(resumen_completo)

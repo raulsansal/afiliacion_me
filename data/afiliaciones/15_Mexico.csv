@@ -1,21 +1,21 @@
-id	nombre	sexo	edad	clave_elector	email	telefono	cve_estado	estado	cve_distrito	distrito	cve_municipio	municipio	seccion	estatus	notas
-1	Guadalupe Sosa Gutiérrez	Mujer	51	SOGTGL74020309M501	gsosag@mail.com	5525451487	15	México	1504	1504 NICOLAS ROMERO	61	NICOLAS ROMERO	2571	Afiliado	Afiliación mediante auxiliar el 1 oct 2025
-2	Jorge Martínez López	Hombre	42	MALOJR80051210H802	jmartlo@mail.com	5536214589	15	México	1517	1517 ECATEPEC DE MORELOS	34	ECATEPEC	1245	Afiliado	Registro en módulo el 15 sep 2025
-3	María Fernández García	Mujer	35	FEGMMA89112803M703	mfergar@mail.com	5514789632	15	México	1504	1504 NICOLAS ROMERO	61	NICOLAS ROMERO	3012	Proceso	Pendiente de confirmar afiliación
-4	Carlos Ramírez Hernández	Hombre	60	RAMHCA75081501H404	cramher@mail.com	5563258941	15	México	1517	1517 ECATEPEC DE MORELOS	34	ECATEPEC	1589	Afiliado	Actualización de datos el 10 sep 2025
-5	Ana López Sánchez	Mujer	28	LOPSAN97033002M505	alopsan@mail.com	5547896321	15	México	1519	1519 TLALNEPANTLA DE BAZ	105	TLALNEPANTLA DE BAZ	2036	Contacto	Contacto iniciado mediante LVS
-6	Pedro Gómez Ruiz	Hombre	55	GOMRUP70072204H606	pgomru@mail.com	5589632541	15	México	1504	1504 NICOLAS ROMERO	61	NICOLAS ROMERO	895	Afiliado	Afiliación en evento comunitario
-7	Laura Díaz Cruz	Mujer	33	DICRLA92041805M707	ldiazcr@mail.com	5532145698	15	México	1519	1519 TLALNEPANTLA DE BAZ	105	TLALNEPANTLA DE BAZ	1456	Afiliado	Registro en oficina central
-8	Ricardo Moreno Jiménez	Hombre	47	MORJRI83120106H808	rmorji@mail.com	5578945612	15	México	1522	1522 NAUCALPAN DE JUAREZ	58	NAUCALPAN DE JUAREZ	3214	Proceso	Afiliación por recomendación
-9	Isabel Torres Vargas	Mujer	50	TORVIS84091007M909	itorva@mail.com	5565412398	15	México	1504	1504 NICOLAS ROMERO	61	NICOLAS ROMERO	1789	Afiliado	Actualización de domicilio
-10	Luis Navarro Mendoza	Hombre	38	NAVMLU91062508H010	lnavme@mail.com	5541236589	15	México	1529	1529 CD. NEZAHUALCOYOTL	60	NEZAHUALCOYOTL	2541	Afiliado	Registro en módulo móvil
-11	Sofía Castro Ramírez	Mujer	29	CASRSO96011509M111	scastr@mail.com	5598741236	15	México	1517	1517 ECATEPEC DE MORELOS	34	ECATEPEC	1023	Contacto	Contato mediante líder universitario
-12	Javier Rojas López	Hombre	44	ROJLJA87053010H212	jroloj@mail.com	5536987412	15	México	1504	1504 NICOLAS ROMERO	61	NICOLAS ROMERO	2015	Afiliado	Registro en plaza pública
-13	Patricia Mendoza Sánchez	Mujer	52	MENSAP83102011M313	pmensa@mail.com	5574125896	15	México	1522	1522 NAUCALPAN DE JUAREZ	58	NAUCALPAN DE JUAREZ	1478	Afiliado	Afiliación por invitación
-14	Miguel Ángel García	Hombre	31	GARHMA94071212H414	mgarhi@mail.com	5525874136	15	México	1519	1519 TLALNEPANTLA DE BAZ	105	TLALNEPANTLA DE BAZ	3014	Contacto	Contacto mediante líderesa comerciantes
-15	Claudia Ortega Martínez	Mujer	40	ORTMCL90042513M515	cortem@mail.com	5587456321	15	México	1504	1504 NICOLAS ROMERO	61	NICOLAS ROMERO	1036	Afiliado	Afiliación en centro comercial
-16	Daniel Hernández Gómez	Hombre	58	HERGOD88031814H616	dhergo@mail.com	5532569874	15	México	1517	1517 ECATEPEC DE MORELOS	34	ECATEPEC	2587	Proceso	Afiliación prevista para asamblea CDMX
-17	Gabriela Sánchez López	Mujer	36	SANLGG93080515M717	gsanlo@mail.com	5563258741	15	México	1504	1504 NICOLAS ROMERO	61	NICOLAS ROMERO	1203	Afiliado	Registro en evento cultural
-18	Alejandro Vargas Ramírez	Hombre	49	VARGAA95021016H818	avargar@mail.com	5547893216	15	México	1519	1529 CD. NEZAHUALCOYOTL	105	TLALNEPANTLA DE BAZ	1895	Afiliado	Afiliación por campaña local
-19	Verónica Pineda Hernández	Mujer	30	PINHVE99113017M919	vpinhe@mail.com	5578963214	15	México	1504	1504 NICOLAS ROMERO	61	NICOLAS ROMERO	1025	Afiliado	Registro en oficina municipal
-20	Roberto Cruz Martínez	Hombre	53	CRUMAR98062218H020	rcrum@mail.com	5514789632	15	México	1529	1529 CD. NEZAHUALCOYOTL	60	NEZAHUALCOYOTL	3012	Afiliado	Afiliación en evento deportivo
+Ôªøid,nombre,sexo,edad,clave_elector,email,telefono,cve_estado,estado,cve_distrito,distrito,cve_municipio,municipio,seccion,estatus,notas
+1,Guadalupe Sosa Guti√©rrez,Mujer,51,SOGTGL74020309M501,gsosag@mail.com,5525451487,15,M√©xico,1504,NICOLAS ROMERO,61,NICOLAS ROMERO,2571,Afiliado,Afiliaci√≥n mediante auxiliar el 1 oct 2025
+2,Jorge Mart√≠nez L√≥pez,Hombre,42,MALOJR80051210H802,jmartlo@mail.com,5536214589,15,M√©xico,1517,ECATEPEC DE MORELOS,34,ECATEPEC,1245,Afiliado,Registro en m√≥dulo el 15 sep 2025
+3,Mar√≠a Fern√°ndez Garc√≠a,Mujer,35,FEGMMA89112803M703,mfergar@mail.com,5514789632,15,M√©xico,1504,NICOLAS ROMERO,61,NICOLAS ROMERO,3012,Proceso,Pendiente de confirmar afiliaci√≥n
+4,Carlos Ram√≠rez Hern√°ndez,Hombre,60,RAMHCA75081501H404,cramher@mail.com,5563258941,15,M√©xico,1517,ECATEPEC DE MORELOS,34,ECATEPEC,1589,Afiliado,Actualizaci√≥n de datos el 10 sep 2025
+5,Ana L√≥pez S√°nchez,Mujer,28,LOPSAN97033002M505,alopsan@mail.com,5547896321,15,M√©xico,1519,TLALNEPANTLA DE BAZ,105,TLALNEPANTLA DE BAZ,2036,Contacto,Contacto iniciado mediante LVS
+6,Pedro G√≥mez Ruiz,Hombre,55,GOMRUP70072204H606,pgomru@mail.com,5589632541,15,M√©xico,1504,NICOLAS ROMERO,61,NICOLAS ROMERO,895,Afiliado,Afiliaci√≥n en evento comunitario
+7,Laura D√≠az Cruz,Mujer,33,DICRLA92041805M707,ldiazcr@mail.com,5532145698,15,M√©xico,1519,TLALNEPANTLA DE BAZ,105,TLALNEPANTLA DE BAZ,1456,Afiliado,Registro en oficina central
+8,Ricardo Moreno Jim√©nez,Hombre,47,MORJRI83120106H808,rmorji@mail.com,5578945612,15,M√©xico,1522,NAUCALPAN DE JUAREZ,58,NAUCALPAN DE JUAREZ,3214,Proceso,Afiliaci√≥n por recomendaci√≥n
+9,Isabel Torres Vargas,Mujer,50,TORVIS84091007M909,itorva@mail.com,5565412398,15,M√©xico,1504,NICOLAS ROMERO,61,NICOLAS ROMERO,1789,Afiliado,Actualizaci√≥n de domicilio
+10,Luis Navarro Mendoza,Hombre,38,NAVMLU91062508H010,lnavme@mail.com,5541236589,15,M√©xico,1529,CD. NEZAHUALCOYOTL,60,NEZAHUALCOYOTL,2541,Afiliado,Registro en m√≥dulo m√≥vil
+11,Sof√≠a Castro Ram√≠rez,Mujer,29,CASRSO96011509M111,scastr@mail.com,5598741236,15,M√©xico,1517,ECATEPEC DE MORELOS,34,ECATEPEC,1023,Contacto,Contato mediante l√≠der universitario
+12,Javier Rojas L√≥pez,Hombre,44,ROJLJA87053010H212,jroloj@mail.com,5536987412,15,M√©xico,1504,NICOLAS ROMERO,61,NICOLAS ROMERO,2015,Afiliado,Registro en plaza p√∫blica
+13,Patricia Mendoza S√°nchez,Mujer,52,MENSAP83102011M313,pmensa@mail.com,5574125896,15,M√©xico,1522,NAUCALPAN DE JUAREZ,58,NAUCALPAN DE JUAREZ,1478,Afiliado,Afiliaci√≥n por invitaci√≥n
+14,Miguel √Ångel Garc√≠a,Hombre,31,GARHMA94071212H414,mgarhi@mail.com,5525874136,15,M√©xico,1519,TLALNEPANTLA DE BAZ,105,TLALNEPANTLA DE BAZ,3014,Contacto,Contacto mediante l√≠deresa comerciantes
+15,Claudia Ortega Mart√≠nez,Mujer,40,ORTMCL90042513M515,cortem@mail.com,5587456321,15,M√©xico,1504,NICOLAS ROMERO,61,NICOLAS ROMERO,1036,Afiliado,Afiliaci√≥n en centro comercial
+16,Daniel Hern√°ndez G√≥mez,Hombre,58,HERGOD88031814H616,dhergo@mail.com,5532569874,15,M√©xico,1517,ECATEPEC DE MORELOS,34,ECATEPEC,2587,Proceso,Afiliaci√≥n prevista para asamblea CDMX
+17,Gabriela S√°nchez L√≥pez,Mujer,36,SANLGG93080515M717,gsanlo@mail.com,5563258741,15,M√©xico,1504,NICOLAS ROMERO,61,NICOLAS ROMERO,1203,Afiliado,Registro en evento cultural
+18,Alejandro Vargas Ram√≠rez,Hombre,49,VARGAA95021016H818,avargar@mail.com,5547893216,15,M√©xico,1519,TLALNEPANTLA DE BAZ,105,TLALNEPANTLA DE BAZ,1895,Afiliado,Afiliaci√≥n por campa√±a local
+19,Ver√≥nica Pineda Hern√°ndez,Mujer,30,PINHVE99113017M919,vpinhe@mail.com,5578963214,15,M√©xico,1504,NICOLAS ROMERO,61,NICOLAS ROMERO,1025,Afiliado,Registro en oficina municipal
+20,Roberto Cruz Mart√≠nez,Hombre,53,CRUMAR98062218H020,rcrum@mail.com,5514789632,15,M√©xico,1529,CD. NEZAHUALCOYOTL,60,NEZAHUALCOYOTL,3012,Afiliado,Afiliaci√≥n en evento deportivo

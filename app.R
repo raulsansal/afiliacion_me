@@ -7,7 +7,7 @@ source("funciones.R")
 source("global.R")
 
 ui <- fluidPage(
-  titlePanel("📊 Monitor de Afiliaciones Políticas - México"),
+  titlePanel("📊 Monitor de Afiliaciones - México Estratégico"),
   
   sidebarLayout(
     sidebarPanel(
@@ -123,7 +123,7 @@ server <- function(input, output, session) {
       ) %>%
       addLegend(
         position = "bottomright",
-        colors = c("#FF0000", "#0000FF", "#FFFF00", "#00FF00", "#cccccc"),
+        colors = c("#D10F3F", "#6BA4C6", "#FFDE6F", "#99C374", "#cccccc"),
         labels = c("<60%", "61-80%", "81-99%", "≥100%", "Sin meta"),
         title = "Avance Estatal",
         opacity = 1
@@ -135,7 +135,7 @@ server <- function(input, output, session) {
     df <- resumen_reactivo()
     
     if (input$filtro_estado != "Todos") {
-      df <- df %>% filter(grepl(input$filtro_estado, estado_nombre, ignore.case = TRUE))
+      df <- df %>% filter(grepl(input$filtro_estado, estado_nombre, ignore.case = TRUE))  # ✅ ¡ESTO YA ESTÁ BIEN!
     }
     if (input$filtro_estatus != "Todos") {
       df <- df %>% filter(estatus == input$filtro_estatus)

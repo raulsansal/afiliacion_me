@@ -46,12 +46,10 @@ expected_states <- c(
 if (file.exists(metas_path)) {
   cat("✅ Intentando cargar metas estatales desde:", metas_path, "\n")
   
-  # Leer como texto primero para verificar contenido
   lines <- readLines(metas_path, warn = FALSE)
   cat("🔍 Primeras 3 líneas del archivo:\n")
   cat(lines[1:3], sep = "\n")
   
-  # Forzar lectura correcta como CSV con coma y UTF-8, ignorando comillas
   metas_estatales <- read_csv(
     metas_path,
     col_names = c("estado_nombre", "meta_estatal"),
@@ -61,7 +59,7 @@ if (file.exists(metas_path)) {
     ),
     locale = locale(encoding = "UTF-8"),
     skip_empty_rows = TRUE,
-    quote = ""  # ← CLAVE: ignora comillas
+    quote = ""
   ) %>%
     select(estado_nombre, meta_estatal) %>%
     mutate(
@@ -74,7 +72,6 @@ if (file.exists(metas_path)) {
   
   cat("✅ Metas estatales cargadas correctamente.\n")
 } else {
-  # Si no existe, usar meta homogénea de 14,000 para todos los estados
   metas_estatales <- data.frame(
     estado_nombre = expected_states,
     meta_estatal = 14000
@@ -101,14 +98,17 @@ cargar_distritos_federales <- function() {
     tryCatch({
       df <- st_read(ruta_shape, quiet = TRUE)
       
-      if (!all(c("ENTIDAD", "DISTRITO") %in% names(df))) {
-        cat("❌ Columnas faltantes (ENTIDAD, DISTRITO). Saltando.\n")
+      # Verificar columnas reales
+      cat("Columnas encontradas:", paste(names(df), collapse = ", "), "\n")
+      
+      # Solo usar columnas necesarias: ENTIDAD, DISTRITO, geometry
+      if (!all(c("ENTIDAD", "DISTRITO", "geometry") %in% names(df))) {
+        cat("❌ Columnas faltantes (ENTIDAD, DISTRITO, geometry). Saltando.\n")
         return(NULL)
       }
       
       # Extraer nombre del estado del nombre de la carpeta
       estado_nombre_raw <- estado %>% str_remove("^\\d+_")
-      # Si es "CDMX", mantenerlo en mayúsculas; si no, aplicar title case
       estado_nombre_raw <- ifelse(estado_nombre_raw == "CDMX", "CDMX", str_to_title(estado_nombre_raw))
       
       # Normalizar nombre del estado, pero con excepción para CDMX
@@ -130,8 +130,9 @@ cargar_distritos_federales <- function() {
         cat("(transformado a WGS84) ")
       }
       
-      # Unir con metas
+      # ✅ ¡CLAVE: SELECCIONAR PRIMERO LAS COLUMNAS BASE, LUEGO MUTATE!
       df_processed <- df %>%
+        select(ENTIDAD, DISTRITO, geometry) %>%  # ← Solo columnas originales
         mutate(
           cve_estado = as.character(ENTIDAD),
           distrito_num = as.character(DISTRITO),
@@ -139,13 +140,12 @@ cargar_distritos_federales <- function() {
           meta_estatal = metas_estatales$meta_estatal[match(estado_nombre_clean, metas_estatales$estado_nombre)],
           monitoreado = !is.na(meta_estatal)
         ) %>%
-        select(cve_estado, distrito_num, estado_nombre, monitoreado, meta_estatal, geometry)
+        select(cve_estado, distrito_num, estado_nombre, monitoreado, meta_estatal, geometry)  # ← Ahora sí, todas las que queremos
       
-      # ✅ VALIDACIÓN GEOMÉTRICA (SIN FILTRAR POR ÁREA POR AHORA)
+      # ✅ VALIDACIÓN GEOMÉTRICA
       df_processed <- df_processed %>%
         st_make_valid() %>%
         filter(!is.na(st_is_valid(.)))
-      # filter(st_area(.) > 0)  # ← COMENTADO TEMPORALMENTE PARA DIAGNÓSTICO
       
       # ✅ RECORTAR AL TERRITORIO DE MÉXICO
       mexico_bbox <- st_bbox(c(xmin = -118.5, xmax = -86.5, ymin = 14.5, ymax = 32.7))
