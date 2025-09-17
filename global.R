@@ -1,8 +1,11 @@
 # global.R
+# 📦 CARGAR PAQUETES NECESARIOS (¡EXPLÍCITAMENTE!)
 library(sf)
 library(dplyr)
 library(purrr)
 library(stringr)
+library(readr)
+library(foreign)
 
 # Configuración
 shape_path <- "afiliacion_shp"
@@ -83,16 +86,29 @@ if (file.exists(metas_path)) {
 cargar_distritos_federales <- function() {
   estados_carpetas <- list.dirs(shape_path, full.names = FALSE, recursive = FALSE)
   
+  # ✅ CREAR LA LISTA DENTRO DE LA FUNCIÓN
   distritos_list <- list()
   
   for (estado in estados_carpetas) {
-    ruta_shape <- file.path(shape_path, estado, "DISTRITO_FEDERAL.shp")
+    # 🔥 BUSCAR ARCHIVO DISTRITO_FEDERAL.SH(P) INSENSIBLE A MAYÚSCULAS/MINÚSCULAS
+    shp_files <- list.files(
+      file.path(shape_path, estado),
+      pattern = "^DISTRITO_FEDERAL\\.",
+      full.names = TRUE,
+      ignore.case = TRUE
+    )
     
-    if (!file.exists(ruta_shape)) {
-      cat("⚠️  No encontrado:", ruta_shape, "\n")
+    # Filtrar solo archivos (no carpetas) — compatible con R < 4.1
+    if (length(shp_files) > 0) {
+      shp_files <- shp_files[file.exists(shp_files) & !file.info(shp_files)$isdir]
+    }
+    
+    if (length(shp_files) == 0) {
+      cat("⚠️  No se encontró ningún archivo DISTRITO_FEDERAL.shp en:", estado, "\n")
       next
     }
     
+    ruta_shape <- shp_files[1]  # Usa el primero que encuentre
     cat("✅ Cargando:", estado, "... ")
     
     tryCatch({
@@ -101,9 +117,23 @@ cargar_distritos_federales <- function() {
       # Verificar columnas reales
       cat("Columnas encontradas:", paste(names(df), collapse = ", "), "\n")
       
-      # Solo usar columnas necesarias: ENTIDAD, DISTRITO, geometry
-      if (!all(c("ENTIDAD", "DISTRITO", "geometry") %in% names(df))) {
-        cat("❌ Columnas faltantes (ENTIDAD, DISTRITO, geometry). Saltando.\n")
+      # ✅ DETECTAR COLUMNAS GEOMÉTRICAS — COMPATIBLE CON TODAS LAS VERSIONES DE sf
+      geom_col <- st_geometry(df)
+      if (is.null(geom_col)) {
+        cat("❌ No se encontró ninguna columna geométrica válida. Saltando.\n")
+        return(NULL)
+      }
+      
+      # Obtener el nombre de la columna geométrica (compatible con cualquier sf)
+      geom_col_name <- names(df)[sapply(df, function(x) inherits(x, "sfc"))][1]
+      if (is.na(geom_col_name)) {
+        cat("❌ No se pudo identificar el nombre de la columna geométrica. Saltando.\n")
+        return(NULL)
+      }
+      
+      # Verificar que tenga las columnas necesarias
+      if (!all(c("ENTIDAD", "DISTRITO") %in% names(df))) {
+        cat("❌ Columnas faltantes (ENTIDAD, DISTRITO). Saltando.\n")
         return(NULL)
       }
       
@@ -124,35 +154,49 @@ cargar_distritos_federales <- function() {
         return(NULL)
       }
       
-      # ⚠️ TRANSFORMACIÓN REAL DE CRS (NO SOLO ASIGNAR)
+      # ⚠️ TRANSFORMACIÓN REAL DE CRS — ¡CORREGIDA!
+      original_crs <- st_crs(df)
+      if (is.na(original_crs$epsg) || is.na(original_crs$proj4string)) {
+        cat("⚠️ CRS no reconocido. Asumiendo UTM Zona 14N (EPSG:32614)...\n")
+        df <- st_set_crs(df, 32614)  # UTM Zona 14N (común en INE)
+      }
+      
       if (!st_is_longlat(df)) {
         df <- st_transform(df, CRS_OBJ)
         cat("(transformado a WGS84) ")
+      } else {
+        cat("(ya está en WGS84) ")
       }
       
       # ✅ ¡CLAVE: SELECCIONAR PRIMERO LAS COLUMNAS BASE, LUEGO MUTATE!
       df_processed <- df %>%
-        select(ENTIDAD, DISTRITO, geometry) %>%  # ← Solo columnas originales
+        select(ENTIDAD, DISTRITO, !!sym(geom_col_name)) %>%  # ← ¡USAMOS LA COLUMNA QUE SEA!
         mutate(
           cve_estado = as.character(ENTIDAD),
-          distrito_num = as.character(DISTRITO),
+          distrito_num = as.numeric(DISTRITO),  # ← ¡CAMBIO CLAVE: A NÚMERO!
           estado_nombre = estado_nombre_clean,
           meta_estatal = metas_estatales$meta_estatal[match(estado_nombre_clean, metas_estatales$estado_nombre)],
           monitoreado = !is.na(meta_estatal)
         ) %>%
-        select(cve_estado, distrito_num, estado_nombre, monitoreado, meta_estatal, geometry)  # ← Ahora sí, todas las que queremos
+        select(cve_estado, distrito_num, estado_nombre, monitoreado, meta_estatal, !!sym(geom_col_name)) %>%
+        rename(geometry = !!sym(geom_col_name))  # ← La renombramos como "geometry" para consistencia
       
       # ✅ VALIDACIÓN GEOMÉTRICA
       df_processed <- df_processed %>%
         st_make_valid() %>%
         filter(!is.na(st_is_valid(.)))
       
-      # ✅ RECORTAR AL TERRITORIO DE MÉXICO
-      mexico_bbox <- st_bbox(c(xmin = -118.5, xmax = -86.5, ymin = 14.5, ymax = 32.7))
-      df_processed <- df_processed %>% st_crop(mexico_bbox)
+      # ✅ ¡ELIMINAMOS EL RECORTADO! Dejamos todas las geometrías completas
+      # mexico_bbox <- st_bbox(c(xmin = -118.5, xmax = -86.5, ymin = 14.5, ymax = 32.7))
+      # df_processed <- df_processed %>% st_crop(mexico_bbox)
       
       cat("✔️ OK\n")
-      return(df_processed)
+      
+      # ✅ ¡ACUMULAR EN LA LISTA LOCAL!
+      distritos_list[[length(distritos_list) + 1]] <- df_processed
+      
+      # ✅ ¡DEVOLVER NULL SOLO SI HAY ERROR — PERO SI TODO VA BIEN, NO DEVUELVA NADA!
+      # La función sigue ejecutándose — no se necesita return aquí.
       
     }, error = function(e) {
       cat("❌ Error al leer:", e$message, "\n")
@@ -160,9 +204,10 @@ cargar_distritos_federales <- function() {
     })
   }
   
-  distritos_validos <- compact(distritos_list)
+  # 👇 ¡UNIR TODOS LOS ESTADOS EN UN SOLO SF OBJECT!
+  distritos_validos <- bind_rows(distritos_list)
   
-  if (length(distritos_validos) == 0) {
+  if (nrow(distritos_validos) == 0) {
     stop("🛑 FATAL: No se cargó ningún distrito federal. Verifica que todos los estados tengan DISTRITO_FEDERAL.shp + sus archivos auxiliares (.shx, .dbf, .prj)")
   }
   
@@ -180,8 +225,10 @@ cargar_distritos_federales <- function() {
     print(extra)
   }
   
-  cat("🎉 Cargados", length(distritos_validos), "estados con distritos federales.\n")
-  return(bind_rows(distritos_validos))
+  cat("🎉 Cargados", nrow(distritos_validos), "distritos federales de", length(unique(distritos_validos$estado_nombre)), "estados.\n")
+  
+  # ✅ ¡ESTA ES LA LÍNEA CLAVE: DEVUELVE EL OBJETO ACUMULADO!
+  return(distritos_validos)
 }
 
 # 👇 CARGAR LOS DATOS ESPACIALES (SOLO UNA VEZ)

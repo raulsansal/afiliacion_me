@@ -3,6 +3,7 @@ library(shiny)
 library(leaflet)
 library(DT)
 
+
 source("funciones.R")
 source("global.R")
 
@@ -108,10 +109,13 @@ server <- function(input, output, session) {
         )
       )
     
-    # Crear mapa — ¡Con vista fija en México!
+    # Crear mapa — ¡Ajustar automáticamente a todo México!
     leaflet(map_data) %>%
-      setView(lng = -102.5, lat = 23.5, zoom = 5) %>%  # Centro geográfico de México
       addTiles() %>%
+      fitBounds(                                  # ← ¡NUEVO!
+        lng1 = -118.5, lat1 = 14.5,
+        lng2 = -86.5,  lat2 = 32.7
+      ) %>%
       addPolygons(
         weight = 1,
         color = "#444",
