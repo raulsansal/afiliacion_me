@@ -1,8 +1,8 @@
 # funciones.R
-
 library(readr)
 library(dplyr)
 library(stringr)
+library(purrr)  # ← ✅ ¡CLAVE! AÑADIDO AQUÍ PARA QUE map() FUNCIONE
 
 # ✅ NUEVA FUNCIÓN: Cargar TODOS los CSV de afiliaciones por estado
 cargar_afiliaciones_todos <- function() {
@@ -47,7 +47,7 @@ cargar_afiliaciones_todos <- function() {
           email = col_character(),
           telefono = col_character(),
           cve_estado = col_character(),
-          estado = col_character(),
+          estado = col_character(),     # ← La leemos, pero la ignoraremos
           cve_distrito = col_character(),
           distrito = col_character(),
           cve_municipio = col_character(),
@@ -105,18 +105,19 @@ cargar_afiliaciones_todos <- function() {
     # Renombrar columnas si están mal
     names(df) <- expected_cols
     
-    # Limpieza y normalización
+    # Limpieza y normalización — ¡IGNORAMOS LA COLUMNA 'estado' DEL CSV!
     df <- df %>%
       mutate(
-        across(all_of(c("id", "nombre", "sexo", "clave_elector", "email", "telefono", "estado", "distrito", "municipio", "notas")), ~ trimws(as.character(.))),
+        across(all_of(c("id", "nombre", "sexo", "clave_elector", "email", "telefono", "distrito", "municipio", "notas")), ~ trimws(as.character(.))),
         cve_estado = trimws(cve_estado),
         cve_distrito = trimws(cve_distrito),
-        distrito_num = str_sub(cve_distrito, -2, -1),  # ✅ Últimos 2 caracteres
-        estado = estado_nombre_clean,  # ← Aquí asignamos el nombre limpio
+        distrito_num = as.character(str_sub(cve_distrito, -2, -1)),  # ✅ FORZADO A CHARACTER
         estatus = trimws(estatus),
-        edad = as.integer(edad)
+        edad = as.integer(edad),
+        # 🚫 Eliminamos la columna 'estado' del CSV — no la usamos
+        estado = NULL  # ← ¡LA ELIMINAMOS!
       ) %>%
-      select(id, nombre, sexo, edad, clave_elector, email, telefono, cve_estado, estado, cve_distrito, distrito_num, estatus, notas)
+      select(id, nombre, sexo, edad, clave_elector, email, telefono, cve_estado, cve_distrito, distrito_num, estatus, notas)
     
     return(df)
   })
@@ -134,33 +135,103 @@ cargar_afiliaciones_todos <- function() {
   return(df_total)
 }
 
-# ✅ FUNCION CORREGIDA: generar_resumen() — AHORA INCLUYE estado_nombre
+# ✅ FUNCION CORREGIDA: generar_resumen() — AHORA USA SOLO cve_estado PARA ASIGNAR estado_nombre
 generar_resumen <- function(df) {
   resumen <- df %>%
-    group_by(cve_estado, distrito_num, estado, estatus) %>%  # ✅ AÑADIMOS "estado" aquí
+    group_by(cve_estado, distrito_num, estatus) %>%
     summarise(total = n(), .groups = 'drop') %>%
     mutate(
       nivel = "distrital",
-      estado_nombre = estado  # ✅ AÑADIMOS ESTA COLUMNA EXPLÍCITA
+      # ✅ ASIGNAMOS estado_nombre DESDE cve_estado, IGUAL QUE EN global.R
+      estado_nombre = case_when(
+        cve_estado == "1" ~ "Aguascalientes",
+        cve_estado == "2" ~ "Baja California",
+        cve_estado == "3" ~ "Baja California Sur",
+        cve_estado == "4" ~ "Campeche",
+        cve_estado == "5" ~ "Coahuila",
+        cve_estado == "6" ~ "Colima",
+        cve_estado == "7" ~ "Chiapas",
+        cve_estado == "8" ~ "Chihuahua",
+        cve_estado == "9" ~ "CDMX",
+        cve_estado == "10" ~ "Durango",
+        cve_estado == "11" ~ "Guanajuato",
+        cve_estado == "12" ~ "Guerrero",
+        cve_estado == "13" ~ "Hidalgo",
+        cve_estado == "14" ~ "Jalisco",
+        cve_estado == "15" ~ "Mexico",
+        cve_estado == "16" ~ "Michoacan",
+        cve_estado == "17" ~ "Morelos",
+        cve_estado == "18" ~ "Nayarit",
+        cve_estado == "19" ~ "Nuevo Leon",
+        cve_estado == "20" ~ "Oaxaca",
+        cve_estado == "21" ~ "Puebla",
+        cve_estado == "22" ~ "Queretaro",
+        cve_estado == "23" ~ "Quintana Roo",
+        cve_estado == "24" ~ "San Luis Potosi",
+        cve_estado == "25" ~ "Sinaloa",
+        cve_estado == "26" ~ "Sonora",
+        cve_estado == "27" ~ "Tabasco",
+        cve_estado == "28" ~ "Tamaulipas",
+        cve_estado == "29" ~ "Tlaxcala",
+        cve_estado == "30" ~ "Veracruz",
+        cve_estado == "31" ~ "Yucatan",
+        cve_estado == "32" ~ "Zacatecas",
+        TRUE ~ "Desconocido"
+      )
     ) %>%
-    select(-estado)  # Opcional: eliminar "estado" si no quieres duplicación
+    select(cve_estado, distrito_num, estado_nombre, estatus, total, nivel)
   
   resumen_estatal <- df %>%
-    group_by(cve_estado, estado, estatus) %>%  # ✅ AÑADIMOS "estado" aquí
+    group_by(cve_estado, estatus) %>%
     summarise(total = n(), .groups = 'drop') %>%
     mutate(
       nivel = "estatal",
-      estado_nombre = estado  # ✅ AÑADIMOS ESTA COLUMNA EXPLÍCITA
+      estado_nombre = case_when(
+        cve_estado == "1" ~ "Aguascalientes",
+        cve_estado == "2" ~ "Baja California",
+        cve_estado == "3" ~ "Baja California Sur",
+        cve_estado == "4" ~ "Campeche",
+        cve_estado == "5" ~ "Coahuila",
+        cve_estado == "6" ~ "Colima",
+        cve_estado == "7" ~ "Chiapas",
+        cve_estado == "8" ~ "Chihuahua",
+        cve_estado == "9" ~ "CDMX",
+        cve_estado == "10" ~ "Durango",
+        cve_estado == "11" ~ "Guanajuato",
+        cve_estado == "12" ~ "Guerrero",
+        cve_estado == "13" ~ "Hidalgo",
+        cve_estado == "14" ~ "Jalisco",
+        cve_estado == "15" ~ "Mexico",
+        cve_estado == "16" ~ "Michoacan",
+        cve_estado == "17" ~ "Morelos",
+        cve_estado == "18" ~ "Nayarit",
+        cve_estado == "19" ~ "Nuevo Leon",
+        cve_estado == "20" ~ "Oaxaca",
+        cve_estado == "21" ~ "Puebla",
+        cve_estado == "22" ~ "Queretaro",
+        cve_estado == "23" ~ "Quintana Roo",
+        cve_estado == "24" ~ "San Luis Potosi",
+        cve_estado == "25" ~ "Sinaloa",
+        cve_estado == "26" ~ "Sonora",
+        cve_estado == "27" ~ "Tabasco",
+        cve_estado == "28" ~ "Tamaulipas",
+        cve_estado == "29" ~ "Tlaxcala",
+        cve_estado == "30" ~ "Veracruz",
+        cve_estado == "31" ~ "Yucatan",
+        cve_estado == "32" ~ "Zacatecas",
+        TRUE ~ "Desconocido"
+      )
     ) %>%
-    select(-estado)
+    select(cve_estado, estado_nombre, estatus, total, nivel)
   
   resumen_nacional <- df %>%
     group_by(estatus) %>%
     summarise(total = n(), .groups = 'drop') %>%
     mutate(
       nivel = "nacional",
-      estado_nombre = "Nacional"  # ✅ Para que tenga sentido en filtro
-    )
+      estado_nombre = "Nacional"
+    ) %>%
+    select(estado_nombre, estatus, total, nivel)
   
   resumen_completo <- bind_rows(resumen_nacional, resumen_estatal, resumen)
   return(resumen_completo)
