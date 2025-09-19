@@ -1,28 +1,34 @@
 # funciones.R
-library(readr)
+library(readxl)    # ← ¡NUEVO PAQUETE PARA LEER EXCEL!
 library(dplyr)
 library(stringr)
-library(purrr)  # ← ✅ ¡CLAVE! AÑADIDO AQUÍ PARA QUE map() FUNCIONE
+library(purrr)
 
-# ✅ NUEVA FUNCIÓN: Cargar TODOS los CSV de afiliaciones por estado
+# ✅ NUEVA FUNCIÓN: Cargar TODOS los archivos .xlsx de afiliaciones por estado
 cargar_afiliaciones_todos <- function() {
   csv_path <- "data/afiliaciones/"
   if (!dir.exists(csv_path)) {
-    stop("❌ Carpeta 'data/afiliaciones/' no existe. Debe contener 32 archivos .csv, uno por estado.")
+    stop("❌ Carpeta 'data/afiliaciones/' no existe. Debe contener 32 archivos .xlsx, uno por estado.")
   }
   
-  archivos <- list.files(csv_path, pattern = "\\.csv$", full.names = TRUE)
+  archivos <- list.files(csv_path, pattern = "\\.xlsx$", full.names = TRUE)
   
   if (length(archivos) == 0) {
-    stop("❌ No se encontraron archivos .csv en 'data/afiliaciones/'.")
+    stop("❌ No se encontraron archivos .xlsx en 'data/afiliaciones/'.")
   }
   
   cat("📂 Cargando", length(archivos), "archivos de afiliaciones...\n")
   
   dfs <- map(archivos, ~ {
-    # Extraer nombre del estado desde el nombre del archivo (ej: "09_CDMX.csv")
-    estado_nombre_raw <- basename(.x) %>% 
-      str_remove("\\.csv$") %>% 
+    # Extraer nombre del archivo (ej: "09_CDMX.xlsx")
+    nombre_archivo <- basename(.x)
+    
+    # ✅ EXTRAER cve_estado DE LOS PRIMEROS 2 CARACTERES (ej: "09_CDMX.xlsx" → "09" → "9")
+    cve_estado <- str_sub(nombre_archivo, 1, 2)
+    cve_estado <- as.character(as.numeric(cve_estado))  # "09" → 9 → "9"
+    
+    # Extraer nombre del estado (ej: "09_CDMX" → "CDMX")
+    estado_nombre_raw <- str_remove(nombre_archivo, "\\.xlsx$") %>% 
       str_remove("^\\d+_")
     
     # Normalizar nombre del estado, pero con excepción para CDMX
@@ -32,94 +38,51 @@ cargar_afiliaciones_todos <- function() {
       normalizar_estado(estado_nombre_raw)
     )
     
-    cat("  → Cargando:", estado_nombre_clean, "\n")
+    cat("  → Cargando:", estado_nombre_clean, " (cve_estado:", cve_estado, ") \n")
     
-    # 🔥 Intentar leer con col_types (forma ideal)
-    df <- tryCatch({
-      read_csv(
-        .x,
-        col_types = cols(
-          id = col_character(),
-          nombre = col_character(),
-          sexo = col_character(),
-          edad = col_integer(),
-          clave_elector = col_character(),
-          email = col_character(),
-          telefono = col_character(),
-          cve_estado = col_character(),
-          estado = col_character(),     # ← La leemos, pero la ignoraremos
-          cve_distrito = col_character(),
-          distrito = col_character(),
-          cve_municipio = col_character(),
-          municipio = col_character(),
-          seccion = col_character(),
-          estatus = col_character(),
-          notas = col_character()
-        ),
-        locale = locale(encoding = "UTF-8"),
-        show_col_types = FALSE
-      )
-    }, error = function(e) {
-      # Si falla, intentar leer como texto y reconstruir
-      cat("⚠️  Error al leer con col_types. Intentando reparar archivo manualmente...\n")
-      
-      lines <- readLines(.x, warn = FALSE)
-      
-      if (length(lines) == 0) return(NULL)
-      
-      header_line <- lines[1]
-      if (!grepl(",", header_line)) {
-        cat("❌ El archivo", basename(.x), "no tiene formato CSV válido.\n")
-        return(NULL)
-      }
-      
-      header_cols <- str_split_fixed(header_line, ",", n = 16)
-      if (length(header_cols) != 16) {
-        cat("❌ Encabezado del archivo", basename(.x), "tiene", length(header_cols), "columnas, se esperaban 16.\n")
-        return(NULL)
-      }
-      
-      data_lines <- lapply(lines[-1], function(x) {
-        if (x == "") return(rep(NA, 16))
-        str_split_fixed(x, ",", n = 16)
-      })
-      
-      data_matrix <- do.call(rbind, data_lines)
-      df <- as.data.frame(data_matrix, stringsAsFactors = FALSE)
-      names(df) <- as.character(header_cols)
-      return(df)
-    })
+    # 🔥 LEER EL ARCHIVO EXCEL (primera hoja, sin encabezado)
+    df_excel <- read_excel(.x, sheet = 1, col_names = FALSE, skip = 0)
     
-    # Validar número de columnas
-    expected_cols <- c(
+    # Verificar que tenga al menos 16 columnas
+    if (ncol(df_excel) < 16) {
+      cat("❌ El archivo", basename(.x), "tiene menos de 16 columnas. Saltando.\n")
+      return(NULL)
+    }
+    
+    # Renombrar columnas por posición (igual que antes)
+    names(df_excel) <- c(
       "id", "nombre", "sexo", "edad", "clave_elector", "email", "telefono",
       "cve_estado", "estado", "cve_distrito", "distrito", "cve_municipio",
       "municipio", "seccion", "estatus", "notas"
     )
     
-    if (is.null(df) || ncol(df) != length(expected_cols)) {
-      cat("❌ El archivo", basename(.x), "no tiene 16 columnas válidas. Saltando.\n")
-      return(NULL)
-    }
+    # ✅ ¡FORZAMOS cve_estado DESDE EL NOMBRE DEL ARCHIVO! 🚨
+    df_excel$cve_estado <- cve_estado
     
-    # Renombrar columnas si están mal
-    names(df) <- expected_cols
+    # ✅ EXTRAER distrito_num desde cve_distrito (últimos 2 dígitos)
+    df_excel$cve_distrito <- trimws(df_excel$cve_distrito)
+    df_excel$distrito_num <- as.character(str_sub(df_excel$cve_distrito, -2, -1))
     
-    # Limpieza y normalización — ¡IGNORAMOS LA COLUMNA 'estado' DEL CSV!
-    df <- df %>%
+    # ✅ FORZAR estado_nombre_clean (no confiar en el Excel)
+    df_excel$estado <- estado_nombre_clean
+    
+    # ✅ LIMPIEZA DE LOS DEMÁS CAMPOS — ¡CON VALIDACIÓN DE EDAD!
+    df_clean <- df_excel %>%
       mutate(
         across(all_of(c("id", "nombre", "sexo", "clave_elector", "email", "telefono", "distrito", "municipio", "notas")), ~ trimws(as.character(.))),
-        cve_estado = trimws(cve_estado),
-        cve_distrito = trimws(cve_distrito),
-        distrito_num = as.character(str_sub(cve_distrito, -2, -1)),  # ✅ FORZADO A CHARACTER
         estatus = trimws(estatus),
-        edad = as.integer(edad),
-        # 🚫 Eliminamos la columna 'estado' del CSV — no la usamos
-        estado = NULL  # ← ¡LA ELIMINAMOS!
+        
+        # ✅ ¡NUEVO: LIMPIAR Y VALIDAR EDAD SIN WARNINGS!
+        edad = case_when(
+          is.na(edad) ~ NA_integer_,
+          trimws(edad) == "" ~ NA_integer_,
+          str_detect(edad, "^\\d+$") ~ as.integer(trimws(edad)),   # Solo si es puro número
+          TRUE ~ NA_integer_  # Cualquier otra cosa → NA
+        )
       ) %>%
-      select(id, nombre, sexo, edad, clave_elector, email, telefono, cve_estado, cve_distrito, distrito_num, estatus, notas)
+      select(id, nombre, sexo, edad, clave_elector, email, telefono, cve_estado, estado, cve_distrito, distrito_num, estatus, notas)
     
-    return(df)
+    return(df_clean)
   })
   
   # Filtrar solo los que se cargaron bien

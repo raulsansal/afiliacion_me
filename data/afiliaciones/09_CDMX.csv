@@ -1,21 +1,21 @@
-锘縤d,nombre,sexo,edad,clave_elector,email,telefono,cve_estado,estado,cve_distrito,distrito,cve_municipio,municipio,seccion,estatus,notas
-1,Guadalupe Sosa Guti茅rrez,Mujer,51,SOGTGL74020309M501,gsosag@mail.com,5525451487,9,CDMX,922,0922 IZTAPALAPA,7,IZTAPALAPA,2571,Afiliado,Afiliaci贸n mediante auxiliar el 1 oct 2025
-2,Jorge Mart铆nez L贸pez,Hombre,42,MALOJR80051210H802,jmartlo@mail.com,5536214589,9,CDMX,922,0922 IZTAPALAPA,7,IZTAPALAPA,1245,Afiliado,Registro en m贸dulo el 15 sep 2025
-3,Mar铆a Fern谩ndez Garc铆a,Mujer,35,FEGMMA89112803M703,mfergar@mail.com,5514789632,9,CDMX,922,0922 IZTAPALAPA,7,IZTAPALAPA,3012,Proceso,Pendiente de confirmar afiliaci贸n
-4,Carlos Ram铆rez Hern谩ndez,Hombre,60,RAMHCA75081501H404,cramher@mail.com,5563258941,9,CDMX,922,0922 IZTAPALAPA,7,IZTAPALAPA,1589,Afiliado,Actualizaci贸n de datos el 10 sep 2025
-5,Ana L贸pez S谩nchez,Mujer,28,LOPSAN97033002M505,alopsan@mail.com,5547896321,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,2036,Contacto,Contacto iniciado mediante LVS
-6,Pedro G贸mez Ruiz,Hombre,55,GOMRUP70072204H606,pgomru@mail.com,5589632541,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,895,Afiliado,Afiliaci贸n en evento comunitario
-7,Laura D铆az Cruz,Mujer,33,DICRLA92041805M707,ldiazcr@mail.com,5532145698,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,1456,Afiliado,Registro en oficina central
-8,Ricardo Moreno Jim茅nez,Hombre,47,MORJRI83120106H808,rmorji@mail.com,5578945612,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,3214,Proceso,Afiliaci贸n por recomendaci贸n
-9,Isabel Torres Vargas,Mujer,50,TORVIS84091007M909,itorva@mail.com,5565412398,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,1789,Afiliado,Actualizaci贸n de domicilio
-10,Luis Navarro Mendoza,Hombre,38,NAVMLU91062508H010,lnavme@mail.com,5541236589,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,2541,Afiliado,Registro en m贸dulo m贸vil
-11,Sof铆a Castro Ram铆rez,Mujer,29,CASRSO96011509M111,scastr@mail.com,5598741236,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,1023,Contacto,Contato mediante l铆der universitario
-12,Javier Rojas L贸pez,Hombre,44,ROJLJA87053010H212,jroloj@mail.com,5536987412,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,2015,Afiliado,Registro en plaza p煤blica
-13,Patricia Mendoza S谩nchez,Mujer,52,MENSAP83102011M313,pmensa@mail.com,5574125896,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,1478,Afiliado,Afiliaci贸n por invitaci贸n
-14,Miguel 脕ngel Garc铆a,Hombre,31,GARHMA94071212H414,mgarhi@mail.com,5525874136,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,3014,Contacto,Contacto mediante l铆deresa comerciantes
-15,Claudia Ortega Mart铆nez,Mujer,40,ORTMCL90042513M515,cortem@mail.com,5587456321,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,1036,Afiliado,Afiliaci贸n en centro comercial
-16,Daniel Hern谩ndez G贸mez,Hombre,58,HERGOD88031814H616,dhergo@mail.com,5532569874,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,2587,Proceso,Afiliaci贸n prevista para asamblea CDMX
-17,Gabriela S谩nchez L贸pez,Mujer,36,SANLGG93080515M717,gsanlo@mail.com,5563258741,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,1203,Afiliado,Registro en evento cultural
-18,Alejandro Vargas Ram铆rez,Hombre,49,VARGAA95021016H818,avargar@mail.com,5547893216,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,1895,Afiliado,Afiliaci贸n por campa帽a local
-19,Ver贸nica Pineda Hern谩ndez,Mujer,30,PINHVE99113017M919,vpinhe@mail.com,5578963214,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,1025,Afiliado,Registro en oficina municipal
-20,Roberto Cruz Mart铆nez,Hombre,53,CRUMAR98062218H020,rcrum@mail.com,5514789632,9,CDMX,922,922 IZTAPALAPA,7,IZTAPALAPA,3012,Afiliado,Afiliaci贸n en evento deportivo
+id	nombre	sexo	edad	clave_elector	email	telefono	cve_estado	estado	cve_distrito	distrito	cve_municipio	municipio	seccion	estatus	notas
+1	Guadalupe Sosa Guti巖rez	Mujer	51	SOGTGL74020309M501	gsosag@mail.com	5525451487	9	CDMX	922	0922 IZTAPALAPA	7	IZTAPALAPA	2571	Contacto	Afiliaci梟 mediante auxiliar el 1 oct 2025
+2	Jorge Mart抧ez L梡ez	Hombre	42	MALOJR80051210H802	jmartlo@mail.com	5536214589	9	CDMX	922	0922 IZTAPALAPA	7	IZTAPALAPA	1245	Proceso	Registro en m梔ulo el 15 sep 2025
+3	Mar抋 Fern噉dez Garc抋	Mujer	35	FEGMMA89112803M703	mfergar@mail.com	5514789632	9	CDMX	922	0922 IZTAPALAPA	7	IZTAPALAPA	3012	Proceso	Pendiente de confirmar afiliaci梟
+4	Carlos Ram抮ez Hern噉dez	Hombre	60	RAMHCA75081501H404	cramher@mail.com	5563258941	9	CDMX	922	0922 IZTAPALAPA	7	IZTAPALAPA	1589	Afiliado	Actualizaci梟 de datos el 10 sep 2025
+5	Ana L梡ez S噉chez	Mujer	28	LOPSAN97033002M505	alopsan@mail.com	5547896321	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	2036	Contacto	Contacto iniciado mediante LVS
+6	Pedro G梞ez Ruiz	Hombre	55	GOMRUP70072204H606	pgomru@mail.com	5589632541	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	895	Contacto	Afiliaci梟 en evento comunitario
+7	Laura D抋z Cruz	Mujer	33	DICRLA92041805M707	ldiazcr@mail.com	5532145698	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	1456	Proceso	Registro en oficina central
+8	Ricardo Moreno Jim巒ez	Hombre	47	MORJRI83120106H808	rmorji@mail.com	5578945612	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	3214	Proceso	Afiliaci梟 por recomendaci梟
+9	Isabel Torres Vargas	Mujer	50	TORVIS84091007M909	itorva@mail.com	5565412398	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	1789	Contacto	Actualizaci梟 de domicilio
+10	Luis Navarro Mendoza	Hombre	38	NAVMLU91062508H010	lnavme@mail.com	5541236589	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	2541	Proceso	Registro en m梔ulo m梫il
+11	Sof抋 Castro Ram抮ez	Mujer	29	CASRSO96011509M111	scastr@mail.com	5598741236	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	1023	Contacto	Contato mediante l抎er universitario
+12	Javier Rojas L梡ez	Hombre	44	ROJLJA87053010H212	jroloj@mail.com	5536987412	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	2015	Proceso	Registro en plaza p渂lica
+13	Patricia Mendoza S噉chez	Mujer	52	MENSAP83102011M313	pmensa@mail.com	5574125896	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	1478	Contacto	Afiliaci梟 por invitaci梟
+14	Miguel 鏽gel Garc抋	Hombre	31	GARHMA94071212H414	mgarhi@mail.com	5525874136	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	3014	Contacto	Contacto mediante l抎eresa comerciantes
+15	Claudia Ortega Mart抧ez	Mujer	40	ORTMCL90042513M515	cortem@mail.com	5587456321	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	1036	Contacto	Afiliaci梟 en centro comercial
+16	Daniel Hern噉dez G梞ez	Hombre	58	HERGOD88031814H616	dhergo@mail.com	5532569874	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	2587	Proceso	Afiliaci梟 prevista para asamblea CDMX
+17	Gabriela S噉chez L梡ez	Mujer	36	SANLGG93080515M717	gsanlo@mail.com	5563258741	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	1203	Proceso	Registro en evento cultural
+18	Alejandro Vargas Ram抮ez	Hombre	49	VARGAA95021016H818	avargar@mail.com	5547893216	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	1895	Contacto	Afiliaci梟 por campa朼 local
+19	Ver梟ica Pineda Hern噉dez	Mujer	30	PINHVE99113017M919	vpinhe@mail.com	5578963214	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	1025	Contacto	Registro en oficina municipal
+20	Roberto Cruz Mart抧ez	Hombre	53	CRUMAR98062218H020	rcrum@mail.com	5514789632	9	CDMX	922	922 IZTAPALAPA	7	IZTAPALAPA	3012	Afiliado	Afiliaci梟 en evento deportivo

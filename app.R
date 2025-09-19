@@ -5,7 +5,7 @@ library(DT)
 library(dplyr)
 library(sf)
 
-source("funciones.R")
+# ✅ ¡CLAVE: CARGAR global.R ANTES DE DEFINIR LA INTERFAZ!
 source("global.R")
 
 ui <- fluidPage(
@@ -18,7 +18,7 @@ ui <- fluidPage(
       
       hr(),
       h5("🔎 Filtrar por"),
-      selectInput("filtro_estado", "Estado", choices = c("Todos", estados_lista), selected = "Todos"),
+      selectInput("filtro_estado", "Estado", choices = c("Todos", estados_lista), selected = "Todos"),  # ✅ ¡AHORA SÍ EXISTE!
       
       # ✅ NUEVO: Select para ESTATUS con valores reales
       selectInput("filtro_estatus", "Estatus", 
