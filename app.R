@@ -5,7 +5,10 @@ library(DT)
 library(dplyr)
 library(sf)
 
-# ✅ ¡CLAVE: CARGAR global.R ANTES DE DEFINIR LA INTERFAZ!
+# ✅ ¡CARGAR PRIMERO LAS FUNCIONES!
+source("funciones.R")
+
+# ✅ LUEGO CARGAR global.R (que usa las funciones)
 source("global.R")
 
 ui <- fluidPage(
@@ -18,9 +21,8 @@ ui <- fluidPage(
       
       hr(),
       h5("🔎 Filtrar por"),
-      selectInput("filtro_estado", "Estado", choices = c("Todos", estados_lista), selected = "Todos"),  # ✅ ¡AHORA SÍ EXISTE!
+      selectInput("filtro_estado", "Estado", choices = c("Todos", estados_lista), selected = "Todos"),
       
-      # ✅ NUEVO: Select para ESTATUS con valores reales
       selectInput("filtro_estatus", "Estatus", 
                   choices = c("Todos", "Afiliado", "Contacto", "Proceso"), 
                   selected = "Todos"),
@@ -41,28 +43,23 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  # Reactivo único: Carga TODOS los CSVs de afiliaciones por estado
   datos_afiliados <- reactive({
     req(input$reload_data)
-    cargar_afiliaciones_todos()  # ← Función nueva en funciones.R
+    cargar_afiliaciones_todos()
   })
   
-  # Agregaciones
   resumen_reactivo <- reactive({
     df <- datos_afiliados()
     generar_resumen(df)
   })
   
-  # MAPA INTERACTIVO — VERSION ORIGINAL QUE FUNCIONABA + MEJORAS
   output$mapa <- renderLeaflet({
     df_agg <- resumen_reactivo()
     
-    # Filtrar por nivel seleccionado
     nivel_seleccionado <- input$nivel_agregacion
     filtro_estado <- input$filtro_estado
     filtro_estatus <- input$filtro_estatus
     
-    # Filtrar por estado y estatus antes de unir con geometría
     if (filtro_estado != "Todos") {
       df_agg <- df_agg %>% filter(estado_nombre == filtro_estado)
     }
@@ -70,14 +67,10 @@ server <- function(input, output, session) {
       df_agg <- df_agg %>% filter(estatus == filtro_estatus)
     }
     
-    # Preparar datos según nivel de visualización
     if (nivel_seleccionado == "nacional") {
-      # Mostrar todos los distritos de todos los estados
       df_agg_filt <- df_agg %>%
         group_by(cve_estado, distrito_num, estatus) %>%
         summarise(total = sum(total), .groups = 'drop')
-      
-      # Unir por cve_estado + distrito_num
       map_data <- merge(
         distritos_federales,
         df_agg_filt,
@@ -85,14 +78,10 @@ server <- function(input, output, session) {
         by.y = c("cve_estado", "distrito_num"),
         all.x = TRUE
       )
-      
     } else if (nivel_seleccionado == "estatal") {
-      # Mostrar solo agregados por estado (un registro por estado)
       df_agg_filt <- df_agg %>%
         filter(nivel == "estatal") %>%
         select(cve_estado, estatus, total)
-      
-      # ✅ ¡UNIR SOLO POR cve_estado! (porque es agregado por estado, no por distrito)
       map_data <- merge(
         distritos_federales,
         df_agg_filt,
@@ -100,14 +89,10 @@ server <- function(input, output, session) {
         by.y = "cve_estado",
         all.x = TRUE
       )
-      
-    } else { # distrital
-      # Mostrar todos los distritos del estado seleccionado (sin agrupar)
+    } else {
       df_agg_filt <- df_agg %>%
         filter(nivel == "distrital") %>%
         select(cve_estado, distrito_num, estatus, total)
-      
-      # Unir por cve_estado + distrito_num
       map_data <- merge(
         distritos_federales,
         df_agg_filt,
@@ -117,30 +102,23 @@ server <- function(input, output, session) {
       )
     }
     
-    # ✅ ¡NO HAY MÁS MERGE AQUÍ! ✅
-    # ¡La línea duplicada ha sido ELIMINADA!
-    
-    # Calcular porcentaje respecto a la meta estatal
     map_data <- map_data %>%
       mutate(
         porcentaje = ifelse(!is.na(meta_estatal) & meta_estatal > 0 & !is.na(total),
                             total / meta_estatal * 100,
                             NA_real_),
-        
-        # ASIGNAR COLOR POR PORCENTAJE DE META (semáforo principal)
         color = case_when(
-          meta_estatal == 0 ~ "#cccccc",                     # Gris: sin meta
-          is.na(porcentaje) ~ "#cccccc",                     # Gris: sin datos
-          porcentaje < 60 ~ "#D10F3F",                       # Rojo: <60%
-          porcentaje >= 60 & porcentaje < 81 ~ "#6BA4C6",    # Azul: 61-80%
-          porcentaje >= 81 & porcentaje < 100 ~ "#FFDE6F",   # Amarillo: 81-99%
-          porcentaje >= 100 ~ "#99C374",                     # Verde: ≥100%
+          meta_estatal == 0 ~ "#cccccc",
+          is.na(porcentaje) ~ "#cccccc",
+          porcentaje < 60 ~ "#D10F3F",
+          porcentaje >= 60 & porcentaje < 81 ~ "#6BA4C6",
+          porcentaje >= 81 & porcentaje < 100 ~ "#FFDE6F",
+          porcentaje >= 100 ~ "#99C374",
           TRUE ~ "#cccccc"
         ),
-        
-        # Texto del popup
         popup_text = paste0(
           "<b>", estado_nombre, "</b><br>",
+          "Distrito: ", distrito_num, " ", distrito, "<br>",   # ← ¡¡¡CLAVE!!! ¡AÑADE EL NÚMERO!
           ifelse(meta_estatal > 0,
                  paste0("Meta: ", format(meta_estatal, big.mark = ","), " | Afiliados: ",
                         ifelse(is.na(total), "0", format(total, big.mark = ",")), 
@@ -150,7 +128,6 @@ server <- function(input, output, session) {
         )
       )
     
-    # Crear mapa — ¡Ajustar automáticamente a todo México!
     leaflet(map_data) %>%
       addTiles() %>%
       fitBounds(
@@ -175,17 +152,14 @@ server <- function(input, output, session) {
       )
   })
   
-  # Tabla de resúmenes
   output$tabla_resumen <- DT::renderDataTable({
     df <- resumen_reactivo()
-    
     if (input$filtro_estado != "Todos") {
       df <- df %>% filter(estado_nombre == input$filtro_estado)
     }
     if (input$filtro_estatus != "Todos") {
       df <- df %>% filter(estatus == input$filtro_estatus)
     }
-    
     df %>%
       datatable(
         options = list(pageLength = 10, lengthMenu = c(10, 25, 50)),
@@ -194,17 +168,14 @@ server <- function(input, output, session) {
       )
   })
   
-  # Tabla cruda
   output$tabla_cruda <- DT::renderDataTable({
     df <- datos_afiliados()
-    
     if (input$filtro_estado != "Todos") {
       df <- df %>% filter(estado == input$filtro_estado)
     }
     if (input$filtro_estatus != "Todos") {
       df <- df %>% filter(estatus == input$filtro_estatus)
     }
-    
     df %>%
       datatable(
         options = list(pageLength = 10, lengthMenu = c(10, 25, 50)),

@@ -6,7 +6,7 @@ library(purrr)
 library(stringr)
 library(readr)
 library(foreign)
-library(readxl)  # ← ¡NUEVO PAQUETE PARA LEER EXCEL!
+library(readxl)
 
 # Configuración
 shape_path <- "afiliacion_shp"
@@ -193,7 +193,7 @@ cargar_distritos_federales <- function() {
         select(ENTIDAD, DISTRITO, !!sym(geom_col_name)) %>%
         mutate(
           cve_estado = as.character(ENTIDAD),
-          distrito_num = as.character(DISTRITO),
+          distrito_num = as.character(DISTRITO),  # ← ¡Esto sigue siendo el número!
           estado_nombre = estado_nombre_clean,
           meta_estatal = metas_estatales$meta_estatal[match(estado_nombre_clean, metas_estatales$estado_nombre)],
           monitoreado = !is.na(meta_estatal)
@@ -205,7 +205,7 @@ cargar_distritos_federales <- function() {
       
       cat("✔️ OK\n")
       
-      # ✅ ¡CLAVE: ACUMULAR EN LA LISTA, NO DEVOLVER!
+      # ✅ ¡ACUMULAR EN LA LISTA!
       distritos_list[[length(distritos_list) + 1]] <- df_processed
       
     }, error = function(e) {
@@ -221,7 +221,7 @@ cargar_distritos_federales <- function() {
     stop("🛑 FATAL: No se cargó ningún distrito federal. Verifica que cada estado tenga DISTRITO_FEDERAL.shp + sus archivos auxiliares (.shx, .dbf, .prj)")
   }
   
-  # Validar que todos los estados esperados están presentes
+  # VALIDAR QUE TODOS LOS ESTADOS ESPERADOS ESTÉN PRESENTES
   loaded_states <- unique(distritos_validos$estado_nombre)
   missing <- setdiff(expected_states, loaded_states)
   extra <- setdiff(loaded_states, expected_states)
@@ -236,7 +236,25 @@ cargar_distritos_federales <- function() {
   }
   
   cat("🎉 Cargados", nrow(distritos_validos), "distritos federales de", length(unique(distritos_validos$estado_nombre)), "estados.\n")
-  return(distritos_validos)  # ← ¡DEVUELVE TODO JUNTO!
+  
+  # ✅ ¡CLAVE: CARGAMOS LOS DATOS DE AFILIACIÓN PARA OBTENER EL NOMBRE COMPLETO DEL DISTRITO!
+  # Solo lo hacemos una vez, al final, para agregarlo al shapefile
+  df_afiliaciones <- cargar_afiliaciones_todos()
+  
+  # Creamos un mapa único de distrito_nombre usando cve_estado y cve_distrito
+  distrito_mapping <- df_afiliaciones %>%
+    select(cve_estado, cve_distrito, distrito) %>%
+    distinct() %>%
+    rename(distrito_num = cve_distrito)  # Para que coincida con el nombre de columna en distritos_validos
+  
+  # ✅ UNIMOS EL NOMBRE DEL DISTRITO AL SHAPEFILE
+  distritos_validos <- distritos_validos %>%
+    left_join(
+      distrito_mapping,
+      by = c("cve_estado", "distrito_num")
+    )
+  
+  return(distritos_validos)
 }
 
 # 👇 CARGAR LOS DATOS ESPACIALES (SOLO UNA VEZ)
